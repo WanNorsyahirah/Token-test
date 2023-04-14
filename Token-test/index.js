@@ -27,6 +27,7 @@ app.get('/hello', verifyToken, (req, res) => {
   console.log(req, res)
   res.send('Hello World!')
 });
+
 app.post('/bye', (req, res) => { 
   res.send('Post request' + data)
 });
@@ -89,22 +90,31 @@ function register( newusername, newpassword, newname, newemail) {
    
 //To generate JWT Token
 function generateToken( userProfile ) {
-  return jwt.sign(
+  return jwt.sign({
     userProfile,
-    'secret' ,
+  }, 'secret' ,
      { expiresIn: 60*60}
   );
 }
+
 function verifyToken(req, res, next) {
   let header = req.headers.authorization 
   console.log(header)
-if(err) {
+
+  let token = header.split(" ")[1]
+
+  jwt.verify(token, 'secret', function(err,decoded){
+    if(err) {
+      res.send("Invalid Token !")
+    }
+/*if(err) {
   res.send("Invalid Token !")
 }
 req.user = decoded
   jwt.verify(token, 'secret', function(err, decoded)
-  { console.log(decoded)// bar
+  { console.log(decoded)// bar*/
 
-next()
+  req.user = decoded
+  next()
 });
 }
